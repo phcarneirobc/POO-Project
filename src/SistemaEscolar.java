@@ -2,30 +2,46 @@ import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-class Disciplina
-{
+class Disciplina {
     String nome;
+    String codigo; // Adicionando código
+    int cargaHoraria; // Adicionando carga horária
 
-    public Disciplina(String nome)
-    {
+    public Disciplina(String nome, String codigo, int cargaHoraria) {
         this.nome = nome;
+        this.codigo = codigo;
+        this.cargaHoraria = cargaHoraria;
     }
-
     public String getNome()
     {
         return nome;
+    }
+
+    public String getCodigo()
+    {
+        return codigo;
+    }
+
+    public int getCargaHoraria()
+    {
+        return cargaHoraria;
     }
 }
 
 class Turma
 {
     String nome;
+    String horario; // Adicionando horário
+    String codigo; // Adicionando código
+    int quantidadeMaxAlunos; // Adicionando quantidade máxima de alunos
     Disciplina disciplina;
     Professor responsavel;
 
-    public Turma(String nome, Disciplina disciplina, Professor responsavel)
-    {
+    public Turma(String nome, String horario, String codigo, int quantidadeMaxAlunos, Disciplina disciplina, Professor responsavel) {
         this.nome = nome;
+        this.horario = horario;
+        this.codigo = codigo;
+        this.quantidadeMaxAlunos = quantidadeMaxAlunos;
         this.disciplina = disciplina;
         this.responsavel = responsavel;
     }
@@ -33,6 +49,21 @@ class Turma
     public String getNome()
     {
         return nome;
+    }
+
+    public String getHorario()
+    {
+        return horario;
+    }
+
+    public String getCodigo()
+    {
+        return codigo;
+    }
+
+    public int getQuantidadeMaxAlunos()
+    {
+        return quantidadeMaxAlunos;
     }
 
     public Disciplina getDisciplina()
@@ -173,11 +204,11 @@ public class SistemaEscolar
     static ArrayList<Pessoa> cadastroDePessoas = new ArrayList<>();
     static ArrayList<Disciplina> cadastroDeDisciplinas = new ArrayList<>();
     static ArrayList<Turma> cadastroDeTurmas = new ArrayList<>();
+    private static Disciplina disciplinaSelecionada;
 
     public static void main(String[] args) {
         menu();
     }
-
     public static void menu() {
         Scanner ler = new Scanner(System.in);
         System.out.println("----- Sistema Escolar -----");
@@ -344,7 +375,13 @@ public class SistemaEscolar
         System.out.print("Nome da Disciplina: ");
         String nomeDisciplina = ler.nextLine();
 
-        Disciplina disciplina = new Disciplina(nomeDisciplina);
+        System.out.print("Código da Disciplina: ");
+        String codigoDisciplina = ler.nextLine();
+
+        System.out.print("Carga Horária da Disciplina: ");
+        int cargaHorariaDisciplina = ler.nextInt();
+
+        Disciplina disciplina = new Disciplina(nomeDisciplina, codigoDisciplina, cargaHorariaDisciplina);
         cadastroDeDisciplinas.add(disciplina);
 
         System.out.println("Disciplina cadastrada com sucesso! Voltando ao menu inicial . . .\n");
@@ -353,6 +390,12 @@ public class SistemaEscolar
 
     public static void cadastrarTurma() {
         Scanner ler = new Scanner(System.in);
+
+        if (cadastroDeDisciplinas.isEmpty()) {
+            System.out.println("Não há disciplinas cadastradas. Por favor, cadastre uma disciplina antes de criar uma turma.");
+            menu();
+            return;
+        }
 
         System.out.println("\n\n --------------- CADASTRAR NOVA TURMA ------------------");
 
@@ -366,7 +409,23 @@ public class SistemaEscolar
 
         System.out.print("Selecione o número da disciplina para a turma: ");
         int indiceDisciplina = ler.nextInt();
+
+        if (indiceDisciplina < 1 || indiceDisciplina > cadastroDeDisciplinas.size()) {
+            System.out.println("Índice de disciplina inválido. Voltando ao menu inicial.");
+            menu();
+            return;
+        }
+
         Disciplina disciplinaSelecionada = cadastroDeDisciplinas.get(indiceDisciplina - 1);
+
+        ler.nextLine(); // Limpar o buffer
+
+        System.out.print("Horário da Turma: ");
+        String horarioTurma = ler.nextLine();
+        System.out.print("Código da Turma: ");
+        String codigoTurma = ler.nextLine();
+        System.out.print("Quantidade Máxima de Alunos na Turma: ");
+        int quantidadeMaximaAlunos = ler.nextInt();
 
         System.out.println("Professores disponíveis:");
         for (int i = 0; i < cadastroDePessoas.size(); i++) {
@@ -377,11 +436,18 @@ public class SistemaEscolar
 
         System.out.print("Selecione o número do professor responsável pela turma: ");
         int indiceProfessor = ler.nextInt();
+
+        if (indiceProfessor < 1 || indiceProfessor > cadastroDePessoas.size() || !(cadastroDePessoas.get(indiceProfessor - 1) instanceof Professor)) {
+            System.out.println("Índice de professor inválido. Voltando ao menu inicial.");
+            menu();
+            return;
+        }
+
         Professor professorResponsavel = (Professor) cadastroDePessoas.get(indiceProfessor - 1);
 
-        Turma turma = new Turma(nomeTurma, disciplinaSelecionada, professorResponsavel);
-        cadastroDeTurmas.add(turma);
+        Turma turma = new Turma(nomeTurma, horarioTurma, codigoTurma, quantidadeMaximaAlunos, disciplinaSelecionada, professorResponsavel);
 
+        cadastroDeTurmas.add(turma);
         professorResponsavel.responsavelPor(turma);
 
         System.out.println("Turma cadastrada com sucesso! Voltando ao menu inicial . . .\n");
