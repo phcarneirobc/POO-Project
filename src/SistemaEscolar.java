@@ -1,6 +1,8 @@
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SistemaEscolar
 {
@@ -182,18 +184,35 @@ public class SistemaEscolar
         String codigoDisciplina = ler.nextLine();
 
         // Adicione a verificação de entrada para carga horária
-        System.out.print("Carga Horária da Disciplina: ");
-        while (!ler.hasNextInt()) {
-            System.out.println("Por favor, insira um número válido para a carga horária.");
-            ler.next(); // Limpar a entrada inválida
-        }
-        int cargaHorariaDisciplina = ler.nextInt();
+        System.out.print("Carga Horária da Disciplina (por exemplo, 72h ou 72): ");
+        String cargaHorariaInput = ler.nextLine();
+
+        // Use uma função para extrair o valor numérico da carga horária
+        int cargaHorariaDisciplina = extrairCargaHoraria(cargaHorariaInput);
 
         Disciplina disciplina = new Disciplina(nomeDisciplina, codigoDisciplina, cargaHorariaDisciplina);
         cadastroDeDisciplinas.add(disciplina);
 
         System.out.println("Disciplina cadastrada com sucesso! Voltando ao menu inicial . . .\n");
         menu();
+    }
+
+    // Função para extrair o valor numérico da carga horária
+    private static int extrairCargaHoraria(String input) {
+        try {
+            // Tenta converter diretamente para inteiro (ex: "72")
+            return Integer.parseInt(input);
+        } catch (NumberFormatException e) {
+            // Se falhar, tenta extrair o número usando expressão regular (ex: "72h")
+            Matcher matcher = Pattern.compile("\\b(\\d+)\\b").matcher(input);
+            if (matcher.find()) {
+                return Integer.parseInt(matcher.group(1));
+            } else {
+                // Se não conseguir extrair, retorna um valor padrão (por exemplo, 0)
+                System.out.println("Formato de carga horária inválido. Usando carga horária padrão (0 horas).");
+                return 0;
+            }
+        }
     }
     public static void cadastrarTurma() {
         Scanner ler = new Scanner(System.in);
