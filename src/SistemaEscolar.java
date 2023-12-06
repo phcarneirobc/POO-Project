@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-public class SistemaEscolarit
+public class SistemaEscolar
 {
     static ArrayList<Pessoa> cadastroDePessoas = new ArrayList<>();
     static ArrayList<Disciplina> cadastroDeDisciplinas = new ArrayList<>();
