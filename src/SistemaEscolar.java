@@ -2,204 +2,7 @@ import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-class Disciplina {
-    String nome;
-    String codigo; // Adicionando código
-    int cargaHoraria; // Adicionando carga horária
-
-    public Disciplina(String nome, String codigo, int cargaHoraria) {
-        this.nome = nome;
-        this.codigo = codigo;
-        this.cargaHoraria = cargaHoraria;
-    }
-    public String getNome()
-    {
-        return nome;
-    }
-
-    public String getCodigo()
-    {
-        return codigo;
-    }
-
-    public int getCargaHoraria()
-    {
-        return cargaHoraria;
-    }
-}
-
-class Turma
-{
-    String nome;
-    String horario; // Adicionando horário
-    String codigo; // Adicionando código
-    int quantidadeMaxAlunos; // Adicionando quantidade máxima de alunos
-    Disciplina disciplina;
-    Professor responsavel;
-
-    public Turma(String nome, String horario, String codigo, int quantidadeMaxAlunos, Disciplina disciplina, Professor responsavel) {
-        this.nome = nome;
-        this.horario = horario;
-        this.codigo = codigo;
-        this.quantidadeMaxAlunos = quantidadeMaxAlunos;
-        this.disciplina = disciplina;
-        this.responsavel = responsavel;
-    }
-
-    public String getNome()
-    {
-        return nome;
-    }
-
-    public String getHorario()
-    {
-        return horario;
-    }
-
-    public String getCodigo()
-    {
-        return codigo;
-    }
-
-    public int getQuantidadeMaxAlunos()
-    {
-        return quantidadeMaxAlunos;
-    }
-
-    public Disciplina getDisciplina()
-    {
-        return disciplina;
-    }
-
-    public Professor getResponsavel()
-    {
-        return responsavel;
-    }
-}
-
-abstract class Pessoa
-{
-    String nome;
-    String dataNascimento;
-    String endereco;
-    String telefone;
-    String CPF;
-
-    public String getNome()
-    {
-        return nome;
-    }
-
-    public void setNome(String nome)
-    {
-        this.nome = nome;
-    }
-
-    public String getDataNascimento()
-    {
-        return dataNascimento;
-    }
-
-    public void setDataNascimento(String dataNascimento)
-    {
-        this.dataNascimento = dataNascimento;
-    }
-
-    public String getEndereco()
-    {
-        return endereco;
-    }
-
-    public void setEndereco(String endereco)
-    {
-        this.endereco = endereco;
-    }
-
-    public String getTelefone()
-    {
-        return telefone;
-    }
-
-    public void setTelefone(String telefone)
-    {
-        this.telefone = telefone;
-    }
-
-    public String getCPF()
-    {
-        return CPF;
-    }
-
-    public void setCPF(String CPF)
-    {
-        this.CPF = CPF;
-    }
-
-    abstract void exibirDados();
-}
-
-class Aluno extends Pessoa
-{
-    int matricula;
-    ArrayList<Turma> turmasMatriculadas = new ArrayList<>();
-
-    public void setMatricula(int matricula)
-    {
-        this.matricula = matricula;
-    }
-
-    public int getMatricula()
-    {
-        return matricula;
-    }
-
-    public void matricular(Turma turma)
-    {
-        turmasMatriculadas.add(turma);
-    }
-
-    @Override
-    void exibirDados()
-    {
-        System.out.println("\nDados do Aluno:");
-        System.out.println("Nome do Aluno: " + this.nome);
-        System.out.println("Data de Nascimento: " + this.dataNascimento);
-        System.out.println("Endereço: " + this.endereco);
-        System.out.println("Telefone: " + this.telefone);
-        System.out.println("CPF: " + this.CPF);
-        System.out.println("Matrícula: " + this.matricula);
-        System.out.println("Turmas Matriculadas: ");
-        for (Turma turma : turmasMatriculadas) {
-            System.out.println("- " + turma.getNome() + " (Disciplina: " + turma.getDisciplina().getNome() + ")");
-        }
-    }
-}
-
-class Professor extends Pessoa
-{
-    ArrayList<Turma> turmasResponsavel = new ArrayList<>();
-
-    public void responsavelPor(Turma turma) {
-        turmasResponsavel.add(turma);
-    }
-
-    @Override
-    void exibirDados()
-    {
-        System.out.println("\nDados do Professor:");
-        System.out.println("Nome do Professor: " + this.nome);
-        System.out.println("Data de Nascimento: " + this.dataNascimento);
-        System.out.println("Endereço: " + this.endereco);
-        System.out.println("Telefone: " + this.telefone);
-        System.out.println("CPF: " + this.CPF);
-        System.out.println("Turmas Responsável: ");
-        for (Turma turma : turmasResponsavel) {
-            System.out.println("- " + turma.getNome() + " (Disciplina: " + turma.getDisciplina().getNome() + ")");
-        }
-    }
-}
-
-public class SistemaEscolar
+public class SistemaEscolarit
 {
     static ArrayList<Pessoa> cadastroDePessoas = new ArrayList<>();
     static ArrayList<Disciplina> cadastroDeDisciplinas = new ArrayList<>();
@@ -238,8 +41,8 @@ public class SistemaEscolar
 
         switch (select) {
             case 1:
-                System.out.println("------- [1.1] - Cadastrar Professor ----------------------");
-                System.out.println("------- [1.2] - Listar Professores Cadastrados ------------");
+                System.out.println("------- [1] - Cadastrar Professor ----------------------");
+                System.out.println("------- [2] - Listar Professores Cadastrados ------------");
                 int subSelect = ler.nextInt();
                 switch (subSelect) {
                     case 1:
@@ -261,8 +64,8 @@ public class SistemaEscolar
                 cadastrarTurma();
                 break;
             case 4:
-                System.out.println("------- [4.1] - Cadastrar Aluno ---------------------------");
-                System.out.println("------- [4.2] - Listar Alunos Cadastrados ------------------");
+                System.out.println("------- [1] - Cadastrar Aluno ---------------------------");
+                System.out.println("------- [2] - Listar Alunos Cadastrados ------------------");
                 int subSelectAluno = ler.nextInt();
                 switch (subSelectAluno) {
                     case 1:
@@ -378,7 +181,12 @@ public class SistemaEscolar
         System.out.print("Código da Disciplina: ");
         String codigoDisciplina = ler.nextLine();
 
+        // Adicione a verificação de entrada para carga horária
         System.out.print("Carga Horária da Disciplina: ");
+        while (!ler.hasNextInt()) {
+            System.out.println("Por favor, insira um número válido para a carga horária.");
+            ler.next(); // Limpar a entrada inválida
+        }
         int cargaHorariaDisciplina = ler.nextInt();
 
         Disciplina disciplina = new Disciplina(nomeDisciplina, codigoDisciplina, cargaHorariaDisciplina);
@@ -387,7 +195,6 @@ public class SistemaEscolar
         System.out.println("Disciplina cadastrada com sucesso! Voltando ao menu inicial . . .\n");
         menu();
     }
-
     public static void cadastrarTurma() {
         Scanner ler = new Scanner(System.in);
 
