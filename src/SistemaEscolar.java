@@ -165,6 +165,10 @@ public class SistemaEscolar
             Aluno aluno = (Aluno) pessoa;
             System.out.print("Matrícula: ");
             aluno.setMatricula(ler.nextInt());
+        } else if (pessoa instanceof Professor) {
+            Professor professor = (Professor) pessoa;
+            System.out.print("Matrícula: ");
+            professor.setMatricula(ler.nextInt());
         }
 
         cadastroDePessoas.add(pessoa);
@@ -172,6 +176,7 @@ public class SistemaEscolar
         System.out.println((pessoa instanceof Aluno ? "Aluno" : "Professor") + " cadastrado com sucesso! Voltando ao menu inicial . . .\n");
         menu();
     }
+
     public static void cadastrarDisciplina() {
         Scanner ler = new Scanner(System.in);
 
@@ -204,7 +209,7 @@ public class SistemaEscolar
             return Integer.parseInt(input);
         } catch (NumberFormatException e) {
             // Se falhar, tenta extrair o número usando expressão regular (ex: "72h")
-            Matcher matcher = Pattern.compile("\\b(\\d+)\\b").matcher(input);
+            Matcher matcher = Pattern.compile("(\\d+)\\s*(?:h|horas?)?", Pattern.CASE_INSENSITIVE).matcher(input);
             if (matcher.find()) {
                 return Integer.parseInt(matcher.group(1));
             } else {
@@ -253,58 +258,77 @@ public class SistemaEscolar
         System.out.print("Quantidade Máxima de Alunos na Turma: ");
         int quantidadeMaximaAlunos = ler.nextInt();
 
-        System.out.println("Professores disponíveis:");
-        for (int i = 0; i < cadastroDePessoas.size(); i++) {
-            if (cadastroDePessoas.get(i) instanceof Professor) {
-                System.out.println((i + 1) + ". " + cadastroDePessoas.get(i).getNome());
+        // Verificar se há professores disponíveis
+        if (cadastroDePessoas.stream().anyMatch(pessoa -> pessoa instanceof Professor)) {
+            System.out.println("Professores disponíveis:");
+            for (int i = 0; i < cadastroDePessoas.size(); i++) {
+                if (cadastroDePessoas.get(i) instanceof Professor) {
+                    System.out.println((i + 1) + ". " + cadastroDePessoas.get(i).getNome());
+                }
             }
+
+            System.out.print("Selecione o número do professor responsável pela turma: ");
+            int indiceProfessor = ler.nextInt();
+
+            if (indiceProfessor < 1 || indiceProfessor > cadastroDePessoas.size() || !(cadastroDePessoas.get(indiceProfessor - 1) instanceof Professor)) {
+                System.out.println("Índice de professor inválido. Voltando ao menu inicial.");
+                menu();
+                return;
+            }
+
+            Professor professorResponsavel = (Professor) cadastroDePessoas.get(indiceProfessor - 1);
+
+            Turma turma = new Turma(nomeTurma, horarioTurma, codigoTurma, quantidadeMaximaAlunos, disciplinaSelecionada, professorResponsavel);
+
+            cadastroDeTurmas.add(turma);
+            professorResponsavel.responsavelPor(turma);
+
+            System.out.println("Turma cadastrada com sucesso! Voltando ao menu inicial . . .\n");
+        } else {
+            System.out.println("Não há professores disponíveis. Por favor, cadastre um professor antes de criar uma turma.");
         }
 
-        System.out.print("Selecione o número do professor responsável pela turma: ");
-        int indiceProfessor = ler.nextInt();
-
-        if (indiceProfessor < 1 || indiceProfessor > cadastroDePessoas.size() || !(cadastroDePessoas.get(indiceProfessor - 1) instanceof Professor)) {
-            System.out.println("Índice de professor inválido. Voltando ao menu inicial.");
-            menu();
-            return;
-        }
-
-        Professor professorResponsavel = (Professor) cadastroDePessoas.get(indiceProfessor - 1);
-
-        Turma turma = new Turma(nomeTurma, horarioTurma, codigoTurma, quantidadeMaximaAlunos, disciplinaSelecionada, professorResponsavel);
-
-        cadastroDeTurmas.add(turma);
-        professorResponsavel.responsavelPor(turma);
-
-        System.out.println("Turma cadastrada com sucesso! Voltando ao menu inicial . . .\n");
         menu();
     }
 
     public static void gerenciarMatriculaAlunos() {
         Scanner ler = new Scanner(System.in);
 
-        if (cadastroDeAlunos().size() == 999 || cadastroDeTurmas.size() == 999) {
+        if (cadastroDeAlunos().isEmpty() || cadastroDeTurmas.isEmpty()) {
             System.out.println("\n ****Nenhum aluno ou turma cadastrada!**** \nPor favor, selecione a Opcao [4] ou [3] para cadastrar novos alunos ou turmas.\n\n");
             menu();
+            return;
+        }
+
+        System.out.println("\n..................... Gerenciar Matrícula de Alunos ....................\n");
+
+        // Listar alunos
+        System.out.println("Alunos disponíveis:");
+        ArrayList<Aluno> alunosDisponiveis = cadastroDeAlunos();
+        for (int i = 0; i < alunosDisponiveis.size(); i++) {
+            System.out.println((i + 1) + ". " + alunosDisponiveis.get(i).getNome());
+        }
+
+        System.out.println("Turmas disponíveis:");
+        for (int i = 0; i < cadastroDeTurmas.size(); i++) {
+            System.out.println((i + 1) + ". " + cadastroDeTurmas.get(i).getNome() + " (Disciplina: " + cadastroDeTurmas.get(i).getDisciplina().getNome() + ")");
+        }
+
+        System.out.print("Selecione o número do aluno para matrícula ou alteração de dados: ");
+        int indiceAluno = ler.nextInt();
+
+        if (indiceAluno < 1 || indiceAluno > alunosDisponiveis.size()) {
+            System.out.println("Índice de aluno inválido. Voltando ao menu inicial.");
+            menu();
+            return;
+        }
+
+        Aluno alunoSelecionado = alunosDisponiveis.get(indiceAluno - 1);
+
+        // Verificar se há turmas disponíveis
+        if (cadastroDeTurmas.isEmpty()) {
+            System.out.println("Não há turmas disponíveis. Por favor, cadastre uma turma antes de adicionar um aluno.");
         } else {
-            System.out.println("\n..................... Gerenciar Matrícula de Alunos ....................\n");
-
-            // Listar alunos
-            System.out.println("Alunos disponíveis:");
-            ArrayList<Aluno> alunosDisponiveis = cadastroDeAlunos();
-            for (int i = 0; i < alunosDisponiveis.size(); i++) {
-                System.out.println((i + 1) + ". " + alunosDisponiveis.get(i).getNome());
-            }
-
-            System.out.println("Turmas disponíveis:");
-            for (int i = 0; i < cadastroDeTurmas.size(); i++) {
-                System.out.println((i + 1) + ". " + cadastroDeTurmas.get(i).getNome() + " (Disciplina: " + cadastroDeTurmas.get(i).getDisciplina().getNome() + ")");
-            }
-
-            System.out.print("Selecione o número do aluno para matrícula ou alteração de dados: ");
-            int indiceAluno = ler.nextInt();
-            Aluno alunoSelecionado = alunosDisponiveis.get(indiceAluno - 1);
-
             // Opção para editar dados ou adicionar à nova turma
             System.out.println("Escolha uma opção:");
             System.out.println("1. Editar dados do aluno");
@@ -326,6 +350,9 @@ public class SistemaEscolar
             }
         }
     }
+
+// Restante do código...
+4
 
     private static void editarDadosAluno(Aluno aluno)
     {
@@ -376,11 +403,30 @@ public class SistemaEscolar
         int indiceTurma = ler.nextInt();
         Turma turmaSelecionada = cadastroDeTurmas.get(indiceTurma - 1);
 
+        // Verificar se o aluno já está matriculado na turma
+        if (alunoEstaMatriculado(aluno, turmaSelecionada)) {
+            System.out.println("O aluno já está matriculado nesta turma. Voltando ao menu inicial.");
+            menu();
+            return;
+        }
+
         aluno.matricular(turmaSelecionada);
 
         System.out.println("Matrícula realizada com sucesso! Voltando ao menu inicial . . .\n");
         menu();
     }
+
+    // Função para verificar se o aluno já está matriculado em uma turma
+    private static boolean alunoEstaMatriculado(Aluno aluno, Turma turma)
+    {
+        for (Turma turmaMatriculada : aluno.turmasMatriculadas) {
+            if (turmaMatriculada.equals(turma)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     public static void emitirDeclaracaoMatricula()
     {
